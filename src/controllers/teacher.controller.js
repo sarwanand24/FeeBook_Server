@@ -675,9 +675,15 @@ const updateTeacherDetails = asyncHandler(async (req, res) => {
  const updateFeesDetails = asyncHandler(async (req, res) => {
    const { id } = req.params;
    const { student, feeRecords, Class, teacher } = req.body;
+
+   console.log('teacher and class-->', teacher, Class)
  
    if (!id || !student || Object.keys(student).length === 0) {
      throw new ApiError(400, "No student data or ID received");
+   }
+
+    if (!Class || !teacher) {
+     throw new ApiError(400, "No Class or Teacher Id received");
    }
 
       // Validate feeRecords as an array
