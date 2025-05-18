@@ -698,7 +698,7 @@ const updateTeacherDetails = asyncHandler(async (req, res) => {
 
        console.log("✅ Updated Student:", updatedStudent);
 
-    const feeRecordDeletion = await FeeRecord.deleteMany({ student: studentId });
+    const feeRecordDeletion = await FeeRecord.deleteMany({ student: id });
 
       console.log("✅ Deleted Fees Records:", feeRecordDeletion);
 
