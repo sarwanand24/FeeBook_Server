@@ -672,6 +672,83 @@ const updateTeacherDetails = asyncHandler(async (req, res) => {
   }
 })
 
+ const updateFeesDetails = asyncHandler(async (req, res) => {
+   const { id } = req.params;
+   const { student, feeRecords, Class, teacher } = req.body;
+ 
+   if (!id || !student || Object.keys(student).length === 0) {
+     throw new ApiError(400, "No student data or ID received");
+   }
+
+      // Validate feeRecords as an array
+    if (!Array.isArray(feeRecords)) {
+      return res.status(400).json({ success: false, message: "Fee records should be an array." });
+    }
+ 
+   try {
+     const updatedStudent = await Student.findByIdAndUpdate(
+       id,
+       { $set: student }, // ✅ Spread student properties correctly
+       { new: true, runValidators: true } // ✅ Ensures validation runs on update
+     );
+ 
+     if (!updatedStudent) {
+       throw new ApiError(404, "Student not found or update failed");
+     }
+
+       console.log("✅ Updated Student:", updatedStudent);
+
+    const feeRecordDeletion = await FeeRecord.deleteMany({ student: studentId });
+
+      console.log("✅ Deleted Fees Records:", feeRecordDeletion);
+
+       if (!feeRecordDeletion) {
+       throw new ApiError(404, "fee record deletion failed");
+     }
+
+      const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+  
+    // Fee Records (Array of Months with Subject-wise Fees)
+    const feeRecordsArray = feeRecords.map(({ month, year, feeAmount }) => {
+      if (!month || !year || !feeAmount) {
+        throw new Error("Invalid fee record data. Month, year, and feeAmount are required.");
+      }
+  
+      return {
+        student: id,
+        teacher,
+        class: Class,
+        month: monthNames[parseInt(month) - 1] || "Unknown",
+        year: parseInt(year),
+        amountPaid: feeAmount,
+        datePaid: new Date(),
+        status: "Paid",
+      };
+    });
+  
+    // Save All Fee Records
+    await FeeRecord.insertMany(feeRecordsArray).catch(err => {
+      throw new Error("Failed to save fee records: " + err.message);
+    });
+ 
+     res.status(200).json({
+       success: true,
+       message: "FeeData updated successfully",
+       FeeRecord,
+     });
+   } catch (error) {
+     console.error("❌ Error updating student:", error);
+     res.status(500).json({
+       success: false,
+       message: "Internal Server Error",
+       error: error.message,
+     });
+   }
+ }); 
+
 
  export {
    register,
@@ -686,5 +763,6 @@ const updateTeacherDetails = asyncHandler(async (req, res) => {
    getTeacherRevenueStats,
    getCurrentTeacher,
    updateTeacherDetails,
-   updateFeeUnPaid
+   updateFeeUnPaid,
+   updateFeesDetails
  }

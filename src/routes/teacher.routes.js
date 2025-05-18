@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { addStudents, filteredStudents, getCurrentTeacher, getStudentById, getStudents, getTeacherRevenueStats, loginTeacher, markStudentAsLeft, register,
      updateFee,
+     updateFeesDetails,
      updateFeeUnPaid,
      updateStudentDetails, 
      updateTeacherDetails} from "../controllers/teacher.controller.js";
@@ -32,5 +33,7 @@ router.route("/student/update-fee-unpaid").post(updateFeeUnPaid);
 router.route("/student/filter/:teacherId").get(filteredStudents);
 
 router.route("/revenue/:teacherId").get(getTeacherRevenueStats);
+
+router.route("/update-joinedDate-and-Fees/:id").post(updateFeesDetails);
 
 export default router
